@@ -24,7 +24,7 @@ You need a Pinscope account for the project key.
 From your project's folder:
 
 ```sh
-idf.py add-dependency "pinscope/pinscope^0.2.10"
+idf.py add-dependency "pinscope/pinscope^0.2.11"
 ```
 
 The build downloads it from the
@@ -74,7 +74,7 @@ pinscope_start(&cfg);
 Install the library: in the Arduino IDE, **Tools → Manage Libraries**,
 search for **Pinscope**. Or **Sketch → Include Library → Add .ZIP Library**
 with
-[pinscope-esp-0.2.10.zip](https://github.com/pinscope-dev/pinscope-esp/archive/refs/tags/v0.2.10.zip).
+[pinscope-esp-0.2.11.zip](https://github.com/pinscope-dev/pinscope-esp/archive/refs/tags/v0.2.11.zip).
 Then **File → Examples → Pinscope → RemoteWebServer** is a complete sketch:
 
 ```cpp
@@ -92,9 +92,14 @@ void setup() {
 }
 ```
 
+**PublicSensor**, next to it, serves a sensor reading and its last ten
+minutes on a page anyone can open, built to stay up when many people watch.
+
 Crash reports need Arduino-ESP32 3.x; everything else also works on 2.x.
 Firmware updates need a partition scheme with two app slots (the default has
-them). Lines passed to `pinscope_log()` reach the dashboard's log; the
+them). Upload `<sketch>.ino.bin` from **Sketch → Export Compiled Binary**. To
+have a new firmware that cannot reach Pinscope roll back on its own, add
+`extern "C" bool verifyRollbackLater() { return true; }` to the sketch. Lines passed to `pinscope_log()` reach the dashboard's log; the
 example's `logLine()` sends each line to the serial port and the dashboard.
 
 ## PlatformIO
@@ -102,7 +107,7 @@ example's `logLine()` sends each line to the serial port and the dashboard.
 In `platformio.ini`, with the Arduino or the ESP-IDF framework:
 
 ```ini
-lib_deps = pinscope/pinscope@^0.2.10
+lib_deps = pinscope/pinscope@^0.2.11
 ```
 
 (from the [PlatformIO Registry](https://registry.platformio.org/libraries/pinscope/pinscope))

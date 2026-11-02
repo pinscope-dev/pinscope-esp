@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-#define PINSCOPE_VERSION   "0.2.10"
+#define PINSCOPE_VERSION   "0.2.11"
 #define PINSCOPE_MAX_PORTS 4
 
 typedef enum {
