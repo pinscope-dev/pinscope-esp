@@ -1,0 +1,111 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "pinscope-esp-0.2.15",
+  "documentNamespace": "https://pinscope.dev/spdx/pinscope-esp-0.2.15-e46ae35a-8683-5b41-9b09-540e1d0b32c0",
+  "creationInfo": {
+    "created": "2026-11-06T20:33:44Z",
+    "creators": [
+      "Organization: Pinscope (security@pinscope.dev)",
+      "Tool: component-sbom.py"
+    ]
+  },
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-Pinscope",
+      "name": "pinscope-esp",
+      "versionInfo": "0.2.15",
+      "supplier": "Organization: Pinscope (security@pinscope.dev)",
+      "downloadLocation": "git+https://github.com/pinscope-dev/pinscope-esp.git@v0.2.15",
+      "homepage": "https://pinscope.dev",
+      "licenseConcluded": "LicenseRef-Pinscope-Device-1.0",
+      "licenseDeclared": "LicenseRef-Pinscope-Device-1.0",
+      "copyrightText": "Copyright (c) 2026 Pinscope",
+      "filesAnalyzed": false,
+      "primaryPackagePurpose": "LIBRARY",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:github/pinscope-dev/pinscope-esp@v0.2.15"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-ref10",
+      "name": "ref10 field arithmetic (X25519)",
+      "versionInfo": "NOASSERTION",
+      "originator": "Person: Daniel J. Bernstein, Niels Duif, Tanja Lange, Peter Schwabe, Bo-Yin Yang",
+      "supplier": "Organization: Pinscope (security@pinscope.dev)",
+      "downloadLocation": "https://bench.cr.yp.to/supercop.html",
+      "licenseConcluded": "LicenseRef-public-domain",
+      "licenseDeclared": "LicenseRef-public-domain",
+      "copyrightText": "NONE",
+      "filesAnalyzed": false,
+      "comment": "Adapted into src/ps_crypto.c; the X25519 ladder follows RFC 7748."
+    },
+    {
+      "SPDXID": "SPDXRef-poly1305-donna",
+      "name": "poly1305-donna",
+      "versionInfo": "NOASSERTION",
+      "originator": "Person: Andrew Moon",
+      "supplier": "Organization: Pinscope (security@pinscope.dev)",
+      "downloadLocation": "https://github.com/floodyberry/poly1305-donna",
+      "licenseConcluded": "LicenseRef-public-domain",
+      "licenseDeclared": "LicenseRef-public-domain",
+      "copyrightText": "NONE",
+      "filesAnalyzed": false,
+      "comment": "Adapted into src/ps_crypto.c. ChaCha20 and the AEAD follow RFC 8439, SHA-256 FIPS 180-4, written for Pinscope."
+    },
+    {
+      "SPDXID": "SPDXRef-platform",
+      "name": "ESP-IDF",
+      "versionInfo": "5.0 or later, from the product build",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "https://github.com/espressif/esp-idf",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "filesAnalyzed": false,
+      "comment": "Not part of this component: it is built against the platform of the product, which the product SBOM lists with its version."
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Pinscope"
+    },
+    {
+      "spdxElementId": "SPDXRef-Pinscope",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-ref10"
+    },
+    {
+      "spdxElementId": "SPDXRef-Pinscope",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-poly1305-donna"
+    },
+    {
+      "spdxElementId": "SPDXRef-Pinscope",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-platform"
+    }
+  ],
+  "hasExtractedLicensingInfos": [
+    {
+      "licenseId": "LicenseRef-Pinscope-Device-1.0",
+      "name": "Pinscope Device Licence 1.0",
+      "extractedText": "Source-available: use in any product, with the Pinscope service. The full text is in LICENSE in the package.",
+      "seeAlsos": [
+        "https://github.com/pinscope-dev/pinscope-esp/blob/main/LICENSE"
+      ]
+    },
+    {
+      "licenseId": "LicenseRef-public-domain",
+      "name": "Public domain",
+      "extractedText": "Placed in the public domain by its authors."
+    }
+  ]
+}
