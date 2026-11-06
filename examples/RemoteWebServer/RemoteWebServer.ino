@@ -19,6 +19,18 @@ const char *PINSCOPE_KEY = "psk_...";  // Connect a device, in the dashboard
 
 WebServer server(80);
 
+// How often guests opened this device's link (share link or public page), as
+// the dashboard counts it: Pinscope sends it with every request, in the
+// header X-Pinscope-Visits ("today=12;today_visitors=5;7d=226;30d=562;total=1840").
+// -1 when the request did not come through Pinscope.
+long visits(const char *key) {
+  String header = server.header("X-Pinscope-Visits");
+  String name = String(key) + "=";
+  int at = header.startsWith(name) ? 0 : header.indexOf(";" + name);
+  if (at < 0) return -1;
+  return header.substring(at + (at ? 1 : 0) + name.length()).toInt();
+}
+
 // A line to the serial port and to the dashboard's log.
 void logLine(const char *fmt, ...) {
   char line[160];
@@ -42,8 +54,13 @@ void setup() {
                   "<h1>Hello from the ESP32</h1>"
                   "<p>Free heap: " + String(ESP.getFreeHeap()) + " bytes</p>"
                   "<p>Up for " + String(millis() / 1000) + " s</p>";
+    if (visits("total") >= 0) {
+      page += "<p>Opened " + String(visits("today")) + " times today, " + String(visits("total")) + " in all</p>";
+    }
     server.send(200, "text/html", page);
   });
+  const char *headers[] = {"X-Pinscope-Visits"};
+  server.collectHeaders(headers, 1);  // so server.header() can read it
   server.begin();
 
   // Starts in the background; it waits for WiFi and reconnects on its own.

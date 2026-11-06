@@ -6,6 +6,7 @@
  * `idf.py menuconfig`.
  */
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "esp_app_desc.h"
@@ -48,6 +49,8 @@ static const char INDEX_HTML[] =
     "<div class=t><span>Free heap</span><b id=heap>-</b></div>\n"
     "<div class=t><span>Lowest free heap</span><b id=min>-</b></div>\n"
     "<div class=t><span>WiFi signal</span><b id=rssi>-</b></div>\n"
+    "<div class=t><span>Visits to the link today</span><b id=vt>-</b></div>\n"
+    "<div class=t><span>Visits in all</span><b id=va>-</b></div>\n"
     "<div class=\"t wide row\"><div><span>Round trip to the device (WebSocket)</span><b id=rtt>-</b></div><button onclick=\"if(confirm('Crash the firmware on purpose? It restarts and the crash report appears in Pinscope.'))fetch('/crash')\">Crash it</button></div>\n"
     "</div>\n"
     "<p class=foot>Firmware <code id=app>-</code> &middot; ESP-IDF <code id=idf>-</code></p>\n"
@@ -56,7 +59,8 @@ static const char INDEX_HTML[] =
     "const dur=s=>s<3600?Math.floor(s/60)+' min '+s%60+' s':Math.floor(s/3600)+' h '+Math.floor(s%3600/60)+' min';\n"
     "async function poll(){try{const j=await(await fetch('/api/status')).json();\n"
     "$('chip').textContent=j.chip.toUpperCase().replace(/^ESP32(?=.)/,'ESP32-');$('up').textContent=dur(j.uptime);$('heap').textContent=kb(j.heap);$('min').textContent=kb(j.min_heap);\n"
-    "$('rssi').textContent=j.rssi+' dBm';$('app').textContent=j.app;$('idf').textContent=j.idf;$('d').style.opacity=1}catch(e){$('d').style.opacity=.2}}\n"
+    "$('rssi').textContent=j.rssi+' dBm';$('app').textContent=j.app;$('idf').textContent=j.idf;$('d').style.opacity=1;\n"
+    "if(j.visits_total>=0){$('vt').textContent=j.visits_today;$('va').textContent=j.visits_total}}catch(e){$('d').style.opacity=.2}}\n"
     "poll();setInterval(poll,2000);\n"
     "let ws;function open(){ws=new WebSocket((location.protocol=='https:'?'wss://':'ws://')+location.host+'/ws');\n"
     "ws.onmessage=e=>$('rtt').textContent=Math.round(performance.now()-Number(e.data))+' ms';ws.onclose=()=>setTimeout(open,2000)}\n"
@@ -69,17 +73,37 @@ static esp_err_t index_get(httpd_req_t *req)
     return httpd_resp_send(req, INDEX_HTML, HTTPD_RESP_USE_STRLEN);
 }
 
+/* How often guests opened this device's link (share link or public page), as
+ * the dashboard counts it: Pinscope sends it with every request, in the header
+ * X-Pinscope-Visits ("today=12;today_visitors=5;7d=226;30d=562;total=1840").
+ * -1 when the request did not come through Pinscope. */
+static long visits(httpd_req_t *req, const char *key)
+{
+    char header[96], name[24];
+    if (httpd_req_get_hdr_value_str(req, "X-Pinscope-Visits", header, sizeof(header)) != ESP_OK) {
+        return -1;
+    }
+    snprintf(name, sizeof(name), "%s=", key);
+    for (const char *at = header; at && *at; at = strchr(at, ';') ? strchr(at, ';') + 1 : NULL) {
+        if (strncmp(at, name, strlen(name)) == 0) {
+            return strtol(at + strlen(name), NULL, 10);
+        }
+    }
+    return -1;
+}
+
 static esp_err_t status_get(httpd_req_t *req)
 {
-    char json[224];
+    char json[288];
     wifi_ap_record_t ap = { 0 };
     int rssi = esp_wifi_sta_get_ap_info(&ap) == ESP_OK ? ap.rssi : 0;
     const esp_app_desc_t *app = esp_app_get_description();
     snprintf(json, sizeof(json),
              "{\"chip\":\"%s\",\"heap\":%u,\"min_heap\":%u,\"uptime\":%u,\"rssi\":%d,"
-             "\"app\":\"%s\",\"idf\":\"%s\"}",
+             "\"app\":\"%s\",\"idf\":\"%s\",\"visits_today\":%ld,\"visits_total\":%ld}",
              CONFIG_IDF_TARGET, (unsigned)esp_get_free_heap_size(), (unsigned)esp_get_minimum_free_heap_size(),
-             (unsigned)(esp_timer_get_time() / 1000000), rssi, app->version, app->idf_ver);
+             (unsigned)(esp_timer_get_time() / 1000000), rssi, app->version, app->idf_ver,
+             visits(req, "today"), visits(req, "total"));
     httpd_resp_set_type(req, "application/json");
     return httpd_resp_send(req, json, HTTPD_RESP_USE_STRLEN);
 }

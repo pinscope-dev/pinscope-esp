@@ -39,6 +39,18 @@ WebServer server(80);
 // line the Arduino core accepts every new firmware as soon as it boots.
 extern "C" bool verifyRollbackLater() { return true; }
 
+// How often guests opened this device's link (share link or public page), as
+// the dashboard counts it: Pinscope sends it with every request, in the
+// header X-Pinscope-Visits ("today=12;today_visitors=5;7d=226;30d=562;total=1840").
+// -1 when the request did not come through Pinscope.
+long visits(const char *key) {
+  String header = server.header("X-Pinscope-Visits");
+  String name = String(key) + "=";
+  int at = header.startsWith(name) ? 0 : header.indexOf(";" + name);
+  if (at < 0) return -1;
+  return header.substring(at + (at ? 1 : 0) + name.length()).toInt();
+}
+
 float readSensor() {
   return temperatureRead();  // your sensor here
 }
@@ -61,7 +73,11 @@ void sendData() {
     if (i) json += ',';
     json += String(history[(next - count + i + 60) % 60], 2);
   }
-  json += "]}";
+  json += "]";
+  if (visits("total") >= 0) {
+    json += ",\"visits\":{\"today\":" + String(visits("today")) + ",\"total\":" + String(visits("total")) + "}";
+  }
+  json += "}";
   server.send(200, "application/json", json);
 }
 
@@ -69,6 +85,8 @@ void setup() {
   Serial.begin(115200);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
+  const char *headers[] = {"X-Pinscope-Visits"};
+  server.collectHeaders(headers, 1);  // so server.header() can read it
   server.on("/", [] { server.send_P(200, "text/html", PAGE); });
   server.on("/data.json", sendData);
   server.begin();

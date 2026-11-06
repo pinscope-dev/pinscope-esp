@@ -16,6 +16,7 @@ const char PAGE[] PROGMEM = R"html(<!doctype html>
 <div id="value">…</div>
 <svg viewBox="0 0 59 20" preserveAspectRatio="none"><polyline id="line" fill="none" stroke="currentColor" vector-effect="non-scaling-stroke" stroke-width="2"/></svg>
 <p class="muted" id="note">Last ten minutes</p>
+<p class="muted" id="visits"></p>
 <script>
 async function update() {
   try {
@@ -27,6 +28,8 @@ async function update() {
       d.history.map((v, i) => (i + 60 - d.history.length) + ',' + (span ? 19 - (v - lo) / span * 18 : 10)).join(' '));
     document.getElementById('note').textContent =
       'Last ten minutes: ' + lo.toFixed(1) + ' to ' + hi.toFixed(1) + ' ' + d.unit;
+    if (d.visits) document.getElementById('visits').textContent =
+      'Opened ' + d.visits.today + ' times today, ' + d.visits.total + ' in all';
   } catch (e) {
     document.getElementById('note').textContent = 'The device is not answering right now.';
   }
