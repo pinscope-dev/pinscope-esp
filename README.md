@@ -24,7 +24,7 @@ You need a Pinscope account for the project key.
 From your project's folder:
 
 ```sh
-idf.py add-dependency "pinscope/pinscope^0.2.14"
+idf.py add-dependency "pinscope/pinscope^0.2.15"
 ```
 
 The build downloads it from the
@@ -74,7 +74,7 @@ pinscope_start(&cfg);
 Install the library: in the Arduino IDE, **Tools → Manage Libraries**,
 search for **Pinscope**. Or **Sketch → Include Library → Add .ZIP Library**
 with
-[pinscope-esp-0.2.14.zip](https://github.com/pinscope-dev/pinscope-esp/archive/refs/tags/v0.2.14.zip).
+[pinscope-esp-0.2.15.zip](https://github.com/pinscope-dev/pinscope-esp/archive/refs/tags/v0.2.15.zip).
 Then **File → Examples → Pinscope → RemoteWebServer** is a complete sketch:
 
 ```cpp
@@ -107,7 +107,7 @@ example's `logLine()` sends each line to the serial port and the dashboard.
 In `platformio.ini`, with the Arduino or the ESP-IDF framework:
 
 ```ini
-lib_deps = pinscope/pinscope@^0.2.14
+lib_deps = pinscope/pinscope@^0.2.15
 ```
 
 (from the [PlatformIO Registry](https://registry.platformio.org/libraries/pinscope/pinscope))
