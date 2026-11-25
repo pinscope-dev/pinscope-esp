@@ -6,6 +6,8 @@
 [![Docs](https://img.shields.io/badge/docs-pinscope.dev-9B9CF7)](https://pinscope.dev/docs)
 [![License](https://img.shields.io/badge/license-see%20LICENSE-lightgrey)](LICENSE)
 
+Featured on [CNX Software](https://www.cnx-software.com/2026/11/25/pinscope-a-web-based-remote-access-and-vulnerability-tracking-solution-for-esp32-zephyr-pico-2-w-and-linux-sbcs/).
+
 The device side of [Pinscope](https://pinscope.dev): it gives the web server
 on an ESP32 its own HTTPS address, sends logs, metrics and crash reports, and
 receives firmware updates, over one outbound connection that needs 9.4 KB of
